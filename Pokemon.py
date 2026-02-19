@@ -16,6 +16,15 @@ class Attribute(Enum):
     EVO = 5
     COLOR = 6
 
+with open("Data/colors.csv", 'r') as f:
+    colors = f.readline().strip().split(',')
+
+with open('Data/types.csv', 'r') as f:
+    types = f.readline().strip().split(',')
+
+with open('Data/names.csv', 'r') as f:
+    names = f.readline().strip().split(',')
+
 class Pokemon:
     def __init__(self, id: int, gen: int, type1: int, type2: int, evoStage: int, isFinalEvo: bool, color: int):
         self.id = id
@@ -39,6 +48,9 @@ class Pokemon:
 
     def is_compatible(self, other: 'Pokemon', result: 'QueryResult') -> bool:
         return self.compare(other) == result
+
+    def __str__(self):
+        return  f"{names[self.id]}, {self.gen}, {types[self.type1]}, {types[self.type2]}, {self.evoStage}, {True if self.isFinalEvo else False}, {colors[self.color]}"
 
 
 class QueryResult:
