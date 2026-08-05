@@ -1,5 +1,7 @@
-from guessing_strategies import knuth_min_worst_case, knuth_min_exp_val, shannon_entropy
-from pokemon import Pokemon
+import time
+from typing import Callable
+from guessing_strategies import knuth_mastermind
+from pokemon import Pokemon, Response
 import random
 
 def load_pokemon(pokemon_path: str) -> list[Pokemon]:
@@ -10,24 +12,29 @@ def load_pokemon(pokemon_path: str) -> list[Pokemon]:
             pokemon.append(Pokemon(tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6]))
     return pokemon
 
-def main():
-    possible_answers = load_pokemon('Data/pokemon.csv')
-
-    true_answer = random.choice(possible_answers)
-    print("true answer", true_answer)
-    solved = False
-
+def game(answers: set[Pokemon], answer: Pokemon, guessing_function: Callable[[set[Pokemon], set[Pokemon]], Pokemon]) -> tuple[int, list[Pokemon], float]:
+    past_guesses = []
+    guesses = answers.copy()
     num_guesses = 0
-    while not solved:
-        guess = shannon_entropy(set(possible_answers), set(possible_answers))
+    start_time = time.time()
+    while True:
+        guess = guessing_function(guesses, answers)
         num_guesses += 1
-        print("guess number", num_guesses, "\t", guess)
-        result = true_answer.compare(guess)
-        if result == true_answer.compare(true_answer):
-            solved = True
-        else:
-            possible_answers.remove(guess)
-            possible_answers = [x for x in possible_answers if x.is_compatible(guess, result)]
+        result = answer.compare(guess)
+        if result[0] == Response.MATCH:
+            return num_guesses, past_guesses, time.time() - start_time
+        answers = set([a for a in answers if a.is_compatible(guess, result)])
+        guesses.remove(guess)
+        past_guesses.append(guess)
+
+def main():
+    answers = load_pokemon('Data/pokemon.csv')
+    true_answer = random.choice(answers)
+    num_guesses, guesses, t = game(set(answers), true_answer, knuth_mastermind)
+
+    print("true answer", true_answer)
+    print(f"Solved in {t} seconds using {num_guesses} guesses")
+    # print(f"Guesses were: {",".join(map(str, guesses + [true_answer]))}")
 
 if __name__ == '__main__':
     main()
