@@ -1,4 +1,4 @@
-from guessing_strategies import knuth_mastermind
+from guessing_strategies import knuth_min_worst_case, knuth_min_exp_val, shannon_entropy
 from pokemon import Pokemon
 import random
 
@@ -19,7 +19,7 @@ def main():
 
     num_guesses = 0
     while not solved:
-        guess = knuth_mastermind(set(possible_answers), set(possible_answers))
+        guess = shannon_entropy(set(possible_answers), set(possible_answers))
         num_guesses += 1
         print("guess number", num_guesses, "\t", guess)
         result = true_answer.compare(guess)
