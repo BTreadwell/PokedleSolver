@@ -36,7 +36,7 @@ class Pokemon:
         self.color = color
 
     def compare(self, other: 'Pokemon') -> 'QueryResult':
-        return QueryResult([
+        return QueryResult((
             Response.MATCH if self.id == other.id else Response.NOMATCH,
             Response.MATCH if self.gen == other.gen else Response.QUERY_LT if self.gen > other.gen else Response.QUERY_GT,
             Response.MATCH if self.type1 == other.type1 else Response.TYPE_WRONG_POS if self.type1 == other.type2 else Response.NOMATCH,
@@ -44,7 +44,7 @@ class Pokemon:
             Response.MATCH if self.evoStage == other.evoStage else Response.NOMATCH,
             Response.MATCH if self.isFinalEvo == other.isFinalEvo else Response.NOMATCH,
             Response.MATCH if self.color == other.color else Response.NOMATCH,
-        ])
+        ))
 
     def is_compatible(self, other: 'Pokemon', result: 'QueryResult') -> bool:
         return self.compare(other) == result
@@ -54,7 +54,7 @@ class Pokemon:
 
 
 class QueryResult:
-    def __init__(self, result: list[Response]):
+    def __init__(self, result: tuple[Response, Response, Response, Response, Response, Response, Response]):
         self.result = result
 
     def __getitem__(self, key: Attribute | int) -> Response:
@@ -71,3 +71,5 @@ class QueryResult:
                 return False
         return True
 
+    def __hash__(self) -> int:
+        return hash(self.result)
