@@ -4,10 +4,12 @@ from pokemon import Pokemon
 from collections import defaultdict
 from math import log2
 
+###########################################
 # function for overall strategy
 # (optional) sample guesses and/or answers
 # score each guess against answers
 # return guess with the best score
+###########################################
 def get_next_guess(guesses: set[Pokemon], answers: set[Pokemon], score_function: Callable[[list[int]], float],
                    sample_strategy: Callable[[set[Pokemon], set[Pokemon]], tuple[set[Pokemon], set[Pokemon]]] | None = None) -> Pokemon:
     if len(answers) == 1:
@@ -30,7 +32,9 @@ def get_next_guess(guesses: set[Pokemon], answers: set[Pokemon], score_function:
 
     return best_guess
 
+#######################
 ### Score Functions ###
+#######################
 
 # average score function
 def avg(values: list[int]) -> float:
@@ -40,7 +44,9 @@ def avg(values: list[int]) -> float:
 def inv_entropy(values: list[int]) -> float:
     return sum(val / len(values) * log2(val / len(values)) for val in values)
 
+##################################################################
 ### specific guessing strategies for convenience (no sampling) ###
+##################################################################
 
 # Knuth mastermind algorithm - find the guess that minimizes the size of remaining answers in the worst case (ie: minimax)
 def knuth_mastermind(guesses: set[Pokemon], answers: set[Pokemon]) -> Pokemon:
@@ -54,7 +60,10 @@ def knuth_mastermind_avg(guesses: set[Pokemon], answers: set[Pokemon]) -> Pokemo
 def shannon_entropy(guesses: set[Pokemon], answers: set[Pokemon]) -> Pokemon:
     return get_next_guess(guesses, answers, inv_entropy)
 
+###########################
 ### Sampling strategies ###
+###########################
+
 def _sample_answers(sample_prop: float) -> Callable[[set[Pokemon], set[Pokemon]], tuple[set[Pokemon], set[Pokemon]]]:
     def sample_answers(guesses: set, answers: set) -> tuple[set, set]:
         return guesses, set(random.sample(list(answers), k=int(len(answers) * sample_prop)))
