@@ -4,10 +4,8 @@ from guessing_strategies import shannon_entropy, knuth_mastermind, knuth_masterm
 
 strategies = shannon_entropy, knuth_mastermind, knuth_mastermind_avg
 
-
-
 def main():
-    pokemon = load_pokemon('Data/pokemon.csv')
+    pokemon = load_pokemon('../Data/pokemon.csv')
 
     stats = defaultdict(list)
 
@@ -20,7 +18,7 @@ def main():
     csv_string = "Shannon Guesses, Shannon Time, Knuth WC Guesses, Knuth WC Time, Knuth Avg Guesses, Knuth Avg Time\n"
     csv_string += "\n".join((",".join((",".join(entry) for entry in row))) for row in list(run_stats))
 
-    with open("Statistics/strategy_comparison.csv", "w") as f:
+    with open("strategy_comparison.csv", "w") as f:
         f.write(csv_string)
 
 if __name__ == "__main__":
