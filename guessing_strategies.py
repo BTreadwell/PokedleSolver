@@ -1,8 +1,41 @@
-from typing import Callable
+from dataclasses import dataclass
+from typing import Callable, Protocol
 import random
+
+from game import GameState
 from pokemon import Pokemon
 from collections import defaultdict
 from math import log2
+
+class ScoringComponent(Protocol):
+    def __call__(self, g: Pokemon, curr_state: GameState) -> float:
+        pass
+
+@dataclass
+class Scorer(Protocol):
+    components: list[tuple[ScoringComponent, float]]
+
+    def __call__(self, guesses: set[Pokemon], curr_state: GameState) -> dict[Pokemon, float]:
+        raw_scores = defaultdict(dict)
+        for i, (component, _) in enumerate(self.components):
+            raw_scores[i] = {g : component(g, curr_state) for g in guesses}
+
+        normed_scores = {i : normalize(raw_scores[i]) for i in range(len(self.components))}
+
+        weighted_scores = defaultdict(float)
+        for g in guesses:
+            weighted_scores[g] = sum(normed_scores[i][g] * weight for i, (_, weight) in enumerate(self.components))
+
+        return weighted_scores
+
+def normalize(scores : dict[Pokemon, float]) -> dict[Pokemon, float]:
+    low, high = min(scores.values()), max(scores.values())
+    span = high - low
+    if span == 0:
+        return {g: 0 for g in scores}
+    return {g: (score - low) / span for g, score in scores.items()}
+
+
 
 ###########################################
 # function for overall strategy

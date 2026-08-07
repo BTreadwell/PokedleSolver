@@ -1,8 +1,17 @@
 import time
+from dataclasses import dataclass
 from typing import Callable
 from guessing_strategies import knuth_mastermind
 from pokemon import Pokemon, Response
 import random
+
+@dataclass
+class GameState:
+    answers: set[Pokemon]
+    guesses: set[Pokemon]
+    turn: int
+    history: list[tuple[Pokemon, Response]]
+
 
 def load_pokemon(pokemon_path: str) -> list[Pokemon]:
     pokemon = []
