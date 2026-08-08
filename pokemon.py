@@ -34,6 +34,7 @@ class Pokemon:
         self.evoStage = evoStage
         self.isFinalEvo = isFinalEvo
         self.color = color
+        self.popularity = 1.0
 
     def compare(self, other: 'Pokemon') -> 'QueryResult':
         return QueryResult((

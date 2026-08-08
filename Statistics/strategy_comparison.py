@@ -1,6 +1,6 @@
 from game import load_pokemon, game
 from collections import defaultdict
-from guessing_strategies import shannon_entropy, knuth_mastermind, knuth_mastermind_avg
+from GuessingStrategy.guesser import shannon_entropy, knuth_mastermind, knuth_mastermind_avg
 
 strategies = shannon_entropy, knuth_mastermind, knuth_mastermind_avg
 
