@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from GuessingStrategy.scoring_component import score_entropy, score_guess_in_answers, score_elim_values, score_avg_size, ScoringComponent
+from Solver.scoring_component import score_entropy, score_guess_in_answers, score_elim_values, score_avg_size, ScoringComponent
 from pokemon import Pokemon
 from game_state import GameState
 from collections import defaultdict

@@ -1,6 +1,7 @@
 import time
 from typing import Callable
-from GuessingStrategy.guesser import optimal_entropy_guesser
+from Solver.guesser import optimal_entropy_guesser
+from Solver.solver import get_optimal_solver
 from game_state import GameState
 from pokemon import Pokemon, Response
 import random
@@ -13,27 +14,26 @@ def load_pokemon(pokemon_path: str) -> list[Pokemon]:
             pokemon.append(Pokemon(tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6]))
     return pokemon
 
-def game(answers: set[Pokemon], answer: Pokemon, guessing_function: Callable[[set[Pokemon], set[Pokemon]], Pokemon]) -> tuple[GameState, float]:
-    game_state = GameState(answers, answers, 1, [])
+def timed_game(game_set: set[Pokemon], answer: Pokemon) -> tuple[GameState, float]:
+    game_state = GameState(game_set, game_set, 0, [])
+    solver = get_optimal_solver(game_state)
     start_time = time.time()
     while True:
-        guess = guessing_function(game_state)
+        guess = solver.get_guess()
         result = answer.compare(guess)
+        solver.update_state(guess, result)
+
         if result[0] == Response.MATCH:
-            return game_state, time.time() - start_time
-        game_state.answers = set([a for a in game_state.answers if a.is_compatible(guess, result)])
-        game_state.guesses.remove(guess)
-        game_state.history.append((guess, result))
-        game_state.turn += 1
+            return solver.state, time.time() - start_time
 
 def main():
     answers = load_pokemon('Data/pokemon.csv')
     true_answer = random.choice(answers)
-    game_state, t = game(set(answers), true_answer, optimal_entropy_guesser)
+    game_state, t = timed_game(set(answers), true_answer)
 
     print("true answer", true_answer)
     print(f"Solved in {t} seconds using {game_state.turn} guesses")
-    # print(f"Guesses were: {",".join(map(str, guesses + [true_answer]))}")
+    print(f"Guesses were: {",".join([str(x[0]) for x in game_state.history])}")
 
 if __name__ == '__main__':
     main()

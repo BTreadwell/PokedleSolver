@@ -127,7 +127,7 @@ Then we just choose the guess with the highest score.
 
 ### Implementation
 
-The core implementation is the same across these three algorithms and can be found in [get_next_guess](GuessingStrategy/guesser.py).
+The core implementation is the same across these three algorithms and can be found in [get_next_guess](Solver/guesser.py).
 You can think of the three algorithms above as just describing how to score the guesses so we implement separate score functions for each.
 
 ## Experimental Comparisons
@@ -178,7 +178,7 @@ The code was built using python.
 
 I used a few libraries to do the statistics, matplotlib and numpy, but otherwise the algorithms and simulation code is pure python.
 
-The different guessing strategies/optimal algorithms are implemented in [guessing_strategies.py](GuessingStrategy/guesser.py).
+The different guessing strategies/optimal algorithms are implemented in [guessing_strategies.py](Solver/guesser.py).
 
 [pokemon.py](pokemon.py) contains the classes for representing and comparing Pokemon.
 
