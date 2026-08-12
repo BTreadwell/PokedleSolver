@@ -53,6 +53,11 @@ class Pokemon:
     def __str__(self):
         return  f"{names[self.id]}, {self.gen}, {types[self.type1]}, {types[self.type2]}, {self.evoStage}, {True if self.isFinalEvo else False}, {colors[self.color]}"
 
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __hash__(self):
+        return hash(self.id)
 
 class QueryResult:
     def __init__(self, result: tuple[Response, Response, Response, Response, Response, Response, Response]):

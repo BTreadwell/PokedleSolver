@@ -1,10 +1,26 @@
 import time
-from typing import Callable
-from Solver.guesser import optimal_entropy_guesser
-from Solver.solver import get_optimal_solver
-from game_state import GameState
+from Solver.solver import get_optimal_solver, Solver
+from game_state import GameState, Evaluator
 from pokemon import Pokemon, Response
 import random
+
+class GameInstance:
+    def __init__(self, answer: Pokemon, solvers: list[Solver]):
+        self.answer = answer
+        self.solvers = solvers
+        self.solver_turn = 0
+        self.evaluator = Evaluator(answer)
+        self.solved = False
+
+    def run_game(self) -> Solver:
+        while not self.solved:
+            curr_solver = self.solvers[self.solver_turn]
+            guess = curr_solver.get_guess(self.evaluator)
+            if guess == self.answer:
+                self.solved = True
+                return curr_solver
+            self.solver_turn = (self.solver_turn + 1) % len(self.solvers)
+
 
 def load_pokemon(pokemon_path: str) -> list[Pokemon]:
     pokemon = []
@@ -17,14 +33,10 @@ def load_pokemon(pokemon_path: str) -> list[Pokemon]:
 def timed_game(game_set: set[Pokemon], answer: Pokemon) -> tuple[GameState, float]:
     game_state = GameState(game_set, game_set, 0, [])
     solver = get_optimal_solver(game_state)
+    game = GameInstance(answer, [solver])
     start_time = time.time()
-    while True:
-        guess = solver.get_guess()
-        result = answer.compare(guess)
-        solver.update_state(guess, result)
-
-        if result[0] == Response.MATCH:
-            return solver.state, time.time() - start_time
+    solver = game.run_game()
+    return solver.state, time.time() - start_time
 
 def main():
     answers = load_pokemon('Data/pokemon.csv')

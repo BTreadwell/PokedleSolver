@@ -1,7 +1,7 @@
 from Solver.guesser import Guesser, optimal_entropy_guesser
 from Solver.state_updater import StateUpdater, optimal_updater
-from game_state import GameState
-from pokemon import Pokemon, QueryResult
+from game_state import GameState, Evaluator
+from pokemon import Pokemon
 
 
 class Solver:
@@ -11,12 +11,12 @@ class Solver:
         self.state = start_state
         self.guesses_made = 0
 
-    def get_guess(self) -> Pokemon:
+    def get_guess(self, evaluator: Evaluator) -> Pokemon:
         self.guesses_made += 1
-        return self.guesser(self.state)
-
-    def update_state(self, guess: Pokemon, response: QueryResult):
+        guess = self.guesser(self.state)
+        response = evaluator.evaluate(guess)
         self.state = self.updater(guess, response, self.state)
+        return guess
 
 def get_optimal_solver(state: GameState) -> Solver:
     return Solver(optimal_entropy_guesser, optimal_updater, state)
