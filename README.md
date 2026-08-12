@@ -7,7 +7,7 @@ compare the algorithms.
 - [Motivation](#motivation)
 - [Algorithm Explanations](#algorithm-explanations)
   - [Experimental Comparisons](#experimental-comparisons)
-- [Code Details](#code-details)
+- [Code Details (out of date)](#code-details)
 
 ## Next Steps
 - Implement difficulty levels for a CPU v Player Pokedle match
