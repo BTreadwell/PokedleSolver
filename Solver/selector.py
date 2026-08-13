@@ -1,10 +1,9 @@
 from typing import Protocol
-from dataclasses import dataclass
 import random
 from game_state import GameState
 from pokemon import Pokemon
 
-class SelectionMethod(Protocol):
+class Selector(Protocol):
     def __call__(self, scored_guesses: dict[Pokemon, float], curr_state: GameState) -> Pokemon:
         pass
 
@@ -21,15 +20,13 @@ def select_uniformly(scored_guesses: dict[Pokemon, float], curr_state: GameState
 
 def select_weighted(scored_guesses: dict[Pokemon, float], curr_state: GameState) -> Pokemon:
     guesses, weights = zip(*[(k, v) for k, v in scored_guesses.items()])
-    return random.choices(guesses, weights=weights)[0]
+    try:
+        return random.choices(guesses, weights=weights)[0]
+    except ValueError:
+        return random.choice(list(scored_guesses))
 
-@dataclass
-class Selector:
-    selection_method: SelectionMethod
-
-    def __call__(self, scored_guesses: dict[Pokemon, float], curr_state: GameState) -> Pokemon:
-        return self.selection_method(scored_guesses, curr_state)
-
-optimal_selector = Selector(select_optimal)
-uniform_selector = Selector(select_uniformly)
-weighted_selector = Selector(select_weighted)
+def select_k(selector: Selector, k: int) -> Selector:
+    def k_selector(scored_guesses: dict[Pokemon, float], curr_state: GameState):
+        top_k = {g: v for (g, v) in sorted(list(scored_guesses.items()), key=lambda x : x[1], reverse=True)[:k]}
+        return selector(top_k, curr_state)
+    return k_selector

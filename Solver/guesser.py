@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from Solver.scorer import Scorer, optimal_entropy_scorer, optimal_knuth_wc_scorer, optimal_knuth_avg_scorer
-from Solver.selector import Selector, optimal_selector
+from Solver.selector import Selector, select_optimal
 from game_state import GameState
 from pokemon import Pokemon
 
@@ -15,6 +15,6 @@ class Guesser:
         scored_guesses = self.scorer(game_state.guesses, game_state)
         return self.selector(scored_guesses, game_state)
 
-optimal_entropy_guesser = Guesser(optimal_selector, optimal_entropy_scorer)
-optimal_knuth_wc_guesser = Guesser(optimal_selector, optimal_knuth_wc_scorer)
-optimal_knuth_avg_guesser = Guesser(optimal_selector, optimal_knuth_avg_scorer)
+optimal_entropy_guesser = Guesser(select_optimal, optimal_entropy_scorer)
+optimal_knuth_wc_guesser = Guesser(select_optimal, optimal_knuth_wc_scorer)
+optimal_knuth_avg_guesser = Guesser(select_optimal, optimal_knuth_avg_scorer)
