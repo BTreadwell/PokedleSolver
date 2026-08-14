@@ -13,5 +13,6 @@ def optimal_updater(guess: Pokemon, response: QueryResult, curr_state: GameState
     turn = curr_state.turn + 1
     guesses = curr_state.guesses.difference({guess})
     answers = set([a for a in curr_state.answers if a.is_compatible(guess, response, list(curr_state.visibility))])
-    return GameState(guesses, answers, turn, history)
+    visibility = set(f for f in curr_state.visibility)
+    return GameState(guesses, answers, turn, history, visibility)
 

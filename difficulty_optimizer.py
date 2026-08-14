@@ -12,7 +12,7 @@ from game import load_pokemon, GameInstance
 from game_state import GameState
 from pokemon import Pokemon, Attribute
 
-pokemon = set(load_pokemon("Data/pokemon_core.csv"))
+pokemon = set(load_pokemon("Data/pokemon_w_pop.csv"))
 pokemon_list = list(pokemon)
 
 def suggest_selector(t: Trial) -> Selector:
