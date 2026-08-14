@@ -22,7 +22,7 @@ def global_scoring_comp(value_func):
     def scoring_comp(g: Pokemon, curr_state: GameState) -> float:
         answer_classes = defaultdict(int)
         for answer in curr_state.answers:
-            answer_classes[answer.compare(g)] += 1
+            answer_classes[answer.compare_limited(g, set(curr_state.visibility))] += 1
         score = value_func(answer_classes.values())
         return score
     return scoring_comp

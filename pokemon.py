@@ -6,6 +6,7 @@ class Response(Enum):
     QUERY_LT = 2
     QUERY_GT = 3
     TYPE_WRONG_POS = 4
+    HIDDEN = 999
 
 class Attribute(Enum):
     ID = 0
@@ -26,7 +27,7 @@ with open('Data/names.csv', 'r') as f:
     names = f.readline().strip().split(',')
 
 class Pokemon:
-    def __init__(self, id: int, gen: int, type1: int, type2: int, evoStage: int, isFinalEvo: bool, color: int):
+    def __init__(self, id: int, gen: int, type1: int, type2: int, evoStage: int, isFinalEvo: bool, color: int, popularity: float = 1.0):
         self.id = id
         self.gen = gen
         self.type1 = type1
@@ -34,7 +35,7 @@ class Pokemon:
         self.evoStage = evoStage
         self.isFinalEvo = isFinalEvo
         self.color = color
-        self.popularity = 1.0
+        self.popularity = popularity
 
     def compare(self, other: 'Pokemon') -> 'QueryResult':
         return QueryResult((
@@ -47,8 +48,19 @@ class Pokemon:
             Response.MATCH if self.color == other.color else Response.NOMATCH,
         ))
 
-    def is_compatible(self, other: 'Pokemon', result: 'QueryResult') -> bool:
-        return self.compare(other) == result
+    def compare_limited(self, other: 'Pokemon', fields: set[Attribute]) -> 'QueryResult':
+        tmp_res = self.compare(other)
+        for a in Attribute:
+            if a not in fields:
+                tmp_res[a] = Response.HIDDEN
+        return tmp_res
+
+    def is_compatible(self, other: 'Pokemon', result: 'QueryResult', fields: list[Attribute]) -> bool:
+        alt =  self.compare(other)
+        for field in fields:
+            if alt[field] != result[field]:
+                return False
+        return True
 
     def __str__(self):
         return  f"{names[self.id]}, {self.gen}, {types[self.type1]}, {types[self.type2]}, {self.evoStage}, {True if self.isFinalEvo else False}, {colors[self.color]}"
@@ -70,6 +82,16 @@ class QueryResult:
             return self.result[key.value]
         else:
             raise TypeError
+
+    def __setitem__(self, key: Attribute | int, value: Response):
+        res = list(self.result)
+        if isinstance(key, int):
+            res[key] = value
+        elif isinstance(key, Attribute):
+            res[key.value] = value
+        else:
+            raise TypeError
+        self.result = tuple(res)
 
     def __eq__(self, other):
         for i in range(len(self.result)):

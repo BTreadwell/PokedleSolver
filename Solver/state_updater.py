@@ -12,12 +12,6 @@ def optimal_updater(guess: Pokemon, response: QueryResult, curr_state: GameState
     history = curr_state.history + [(guess, response)]
     turn = curr_state.turn + 1
     guesses = curr_state.guesses.difference({guess})
-    answers = set([a for a in curr_state.answers if a.compare(guess) == response])
+    answers = set([a for a in curr_state.answers if a.is_compatible(guess, response, list(curr_state.visibility))])
     return GameState(guesses, answers, turn, history)
 
-def type_only_updater(guess: Pokemon, response: QueryResult, curr_state: GameState) -> GameState:
-    history = curr_state.history + [(guess, response)]
-    turn = curr_state.turn + 1
-    guesses = curr_state.guesses.difference({guess})
-    answers = set([a for a in curr_state.answers if a.compare(guess)[2] == response[2] and a.compare(guess)[3] == response[3]])
-    return GameState(guesses, answers, turn, history)
