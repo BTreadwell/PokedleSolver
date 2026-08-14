@@ -1,7 +1,7 @@
 import time
 from Solver.solver import get_optimal_solver, Solver
 from game_state import GameState, Evaluator
-from pokemon import Pokemon, Response, Attribute
+from pokemon import Pokemon, Attribute
 import random
 
 class GameInstance:
@@ -26,8 +26,8 @@ def load_pokemon(pokemon_path: str) -> list[Pokemon]:
     pokemon = []
     with open(pokemon_path, 'r') as f:
         for line in f:
-            tmp = [int(x) for x in line.strip().split(',')]
-            pokemon.append(Pokemon(tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6]))
+            data = line.strip().split(',')
+            pokemon.append(Pokemon(int(data[0]), int(data[1]), int(data[2]), int(data[3]), int(data[4]), bool(int(data[5])), int(data[6]), float(data[7])))
     return pokemon
 
 def timed_game(game_set: set[Pokemon], answer: Pokemon) -> tuple[GameState, float]:
@@ -39,7 +39,7 @@ def timed_game(game_set: set[Pokemon], answer: Pokemon) -> tuple[GameState, floa
     return solver.state, time.time() - start_time
 
 def main():
-    answers = load_pokemon('Data/pokemon.csv')
+    answers = load_pokemon('Data/pokemon_w_pop.csv')
     true_answer = random.choice(answers)
     game_state, t = timed_game(set(answers), true_answer)
 

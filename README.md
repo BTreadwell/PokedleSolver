@@ -182,7 +182,7 @@ The different guessing strategies/optimal algorithms are implemented in [guessin
 
 [pokemon.py](pokemon.py) contains the classes for representing and comparing Pokemon.
 
-Pokemon data can be found in the Data directory. [pokemon.csv](Data/pokemon.csv) contains the pokemon species encoding and
+Pokemon data can be found in the Data directory. [pokemon.csv](Data/pokemon_core.csv) contains the pokemon species encoding and
 the other files decode the numeric values to strings for types, names, and colors.
 
 [game.py](game.py) contains the code for simulating a game given an answer and a guessing strategy.
