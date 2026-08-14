@@ -1,7 +1,7 @@
 import time
 from Solver.solver import get_optimal_solver, Solver
 from game_state import GameState, Evaluator
-from pokemon import Pokemon, Response
+from pokemon import Pokemon, Response, Attribute
 import random
 
 class GameInstance:
@@ -31,7 +31,7 @@ def load_pokemon(pokemon_path: str) -> list[Pokemon]:
     return pokemon
 
 def timed_game(game_set: set[Pokemon], answer: Pokemon) -> tuple[GameState, float]:
-    game_state = GameState(game_set, game_set, 0, [])
+    game_state = GameState(game_set, game_set, 0, [], set(a for a in Attribute))
     solver = get_optimal_solver(game_state)
     game = GameInstance(answer, [solver])
     start_time = time.time()
