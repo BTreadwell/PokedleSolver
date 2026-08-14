@@ -12,7 +12,7 @@ from game import load_pokemon, GameInstance
 from game_state import GameState
 from pokemon import Pokemon, Attribute
 
-pokemon = set(load_pokemon("Data/pokemon.csv"))
+pokemon = set(load_pokemon("Data/pokemon_core.csv"))
 pokemon_list = list(pokemon)
 
 def suggest_selector(t: Trial) -> Selector:
@@ -26,19 +26,23 @@ def suggest_selector(t: Trial) -> Selector:
     if kind == "k":
         k = t.suggest_int("selector_k_value", 1, 200)
         base = t.suggest_categorical("k_selector_base", ["uniform", "weighted"])
-        if base == "optimal":
-            return select_k(select_optimal, k)
         if base == "uniform":
             return select_k(select_uniformly, k)
         if base == "weighted":
             return select_k(select_weighted, k)
     raise ValueError("Invalid Selector Kind chosen")
 
-def suggest_updater(t: Trial) -> StateUpdater:
-    kind = t.suggest_categorical("updater_kind", ["optimal"])
-    if kind == "optimal":
-        return optimal_updater
-    raise ValueError("Invalid Updater Kind chosen")
+def suggest_visibility(t: Trial) -> set[Attribute]:
+    visibility = t.suggest_int("visbility_bitmap", 1, 63)
+    fields = set()
+    field_possibilities = [Attribute.GEN, Attribute.T1, Attribute.T2, Attribute.STAGE, Attribute.EVO, Attribute.COLOR]
+    i = 0
+    while visibility > 0:
+        if visibility & 1:
+            fields.add(field_possibilities[i])
+        visibility >>= 1
+        i += 1
+    return fields
 
 def suggest_components(t: Trial) -> list[tuple[ScoringComponent, float]]:
     entropy_weight = t.suggest_float("entropy_weight", 0, 5)
@@ -50,8 +54,8 @@ def suggest_components(t: Trial) -> list[tuple[ScoringComponent, float]]:
         (score_guess_in_answers, in_answer_weight),
     ]
 
-def run_game(scoring_comps: list[tuple[ScoringComponent, float]], selector: Selector, updater: StateUpdater, pokemon: set[Pokemon], answer: Pokemon) -> int:
-    solver = Solver(Guesser(selector, Scorer(scoring_comps)), updater, GameState(pokemon, pokemon, 0, [], set(a for a in Attribute)))
+def run_game(scoring_comps: list[tuple[ScoringComponent, float]], selector: Selector, updater: StateUpdater, pokemon: set[Pokemon], answer: Pokemon, state: GameState) -> int:
+    solver = Solver(Guesser(selector, Scorer(scoring_comps)), updater, state)
     game = GameInstance(answer, [solver])
     score = game.run_game().state.turn
     return score
@@ -60,12 +64,14 @@ def run_game(scoring_comps: list[tuple[ScoringComponent, float]], selector: Sele
 def optimize_difficulty(target: int, variance_weight: float, repeats: int):
     def optimize(trial: Trial):
         selector = suggest_selector(trial)
-        updater = suggest_updater(trial)
+        state_fields = suggest_visibility(trial)
         comps = suggest_components(trial)
+        updater = optimal_updater
         answers = random.choices(pokemon_list, k=repeats)
         turns = []
         for a in answers:
-            turns.append(run_game(comps, selector, updater, pokemon, a))
+            state = GameState(pokemon, pokemon, 0, [], state_fields)
+            turns.append(run_game(comps, selector, updater, pokemon, a, state))
         mean, stdev = np.mean(turns), np.std(turns)
         return abs(mean - target) + variance_weight * stdev
 
@@ -74,7 +80,7 @@ def optimize_difficulty(target: int, variance_weight: float, repeats: int):
 def main():
     storage = "sqlite:///difficulty_study.db"
     study = optuna.create_study(study_name="Find Medium Difficulty", direction="minimize", storage=storage, load_if_exists=True)
-    study.optimize(optimize_difficulty(10, .2, 50), n_trials=25)
+    study.optimize(optimize_difficulty(10, .2, 90), n_trials=100)
 
 if __name__ == "__main__":
     main()
