@@ -26,16 +26,36 @@ with open('Data/types.csv', 'r') as f:
 with open('Data/names.csv', 'r') as f:
     names = f.readline().strip().split(',')
 
+pokemon_data_list = [(-1, 0,0,0,0,False, 0, 0.0)]
+with open('Data/pokemon.csv', 'r') as f:
+    for line in f:
+        data = line.strip().split(',')
+        pokemon_data_list.append((int(data[0]), int(data[1]), int(data[2]), int(data[3]), int(data[4]), bool(int(data[5])), int(data[6]), float(data[7])))
+pokemon_data_list.sort(key = lambda x: x[0])
+
 class Pokemon:
-    def __init__(self, id: int, gen: int, type1: int, type2: int, evoStage: int, isFinalEvo: bool, color: int, popularity: float = 1.0):
+    def __init__(self, id: int, gen: int, type1: int, type2: int, evo_stage: int, is_final_evo: bool, color: int, popularity: float = 1.0):
         self.id = id
         self.gen = gen
         self.type1 = type1
         self.type2 = type2
-        self.evoStage = evoStage
-        self.isFinalEvo = isFinalEvo
+        self.evoStage = evo_stage
+        self.isFinalEvo = is_final_evo
         self.color = color
         self.popularity = popularity
+
+    @classmethod
+    def name_to_id(cls, name: str) -> int:
+        n = name.strip().lower()
+        try:
+            return names.index(n)
+        except ValueError:
+            raise ValueError(f"{name} is not a valid pokemon name.")
+
+    @classmethod
+    def from_id(cls, i: int) -> 'Pokemon':
+        tmp = pokemon_data_list[i]
+        return Pokemon(tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7])
 
     def compare(self, other: 'Pokemon') -> 'QueryResult':
         return QueryResult((

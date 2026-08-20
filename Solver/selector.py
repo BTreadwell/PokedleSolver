@@ -30,3 +30,19 @@ def select_k(selector: Selector, k: int) -> Selector:
         top_k = {g: v for (g, v) in sorted(list(scored_guesses.items()), key=lambda x : x[1], reverse=True)[:k]}
         return selector(top_k, curr_state)
     return k_selector
+
+def player_selector(scored_guesses: dict[Pokemon, float], curr_state: GameState) -> Pokemon:
+    player_choice = input("Enter pokemon: ")
+    while True:
+        try:
+            id = Pokemon.name_to_id(player_choice)
+            choice = Pokemon.from_id(id)
+            if choice in curr_state.guesses:
+                return choice
+            print(f"Guess {player_choice} is invalid.")
+        except ValueError as e:
+            print(e.args[0])
+
+
+
+

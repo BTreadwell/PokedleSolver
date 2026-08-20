@@ -1,4 +1,4 @@
-from Solver.guesser import Guesser, optimal_entropy_guesser
+from Solver.guesser import Guesser, optimal_entropy_guesser, player_guesser
 from Solver.state_updater import StateUpdater, optimal_updater
 from game_state import GameState, Evaluator
 from pokemon import Pokemon
@@ -20,3 +20,6 @@ class Solver:
 
 def get_optimal_solver(state: GameState) -> Solver:
     return Solver(optimal_entropy_guesser, optimal_updater, state)
+
+def get_player_solver(state: GameState) -> Solver:
+    return Solver(player_guesser, player_updater, GameState(set(), state.guesses, state.turn, state.history, set()))
