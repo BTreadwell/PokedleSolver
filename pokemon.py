@@ -27,7 +27,7 @@ with open('Data/names.csv', 'r') as f:
     names = f.readline().strip().split(',')
 
 pokemon_data_list = [(-1, 0,0,0,0,False, 0, 0.0)]
-with open('Data/pokemon.csv', 'r') as f:
+with open('Data/pokemon_w_pop.csv', 'r') as f:
     for line in f:
         data = line.strip().split(',')
         pokemon_data_list.append((int(data[0]), int(data[1]), int(data[2]), int(data[3]), int(data[4]), bool(int(data[5])), int(data[6]), float(data[7])))
@@ -121,3 +121,7 @@ class QueryResult:
 
     def __hash__(self) -> int:
         return hash(self.result)
+
+    def __str__(self) -> str:
+        msg = f"{self.result}"
+        return msg

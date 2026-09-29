@@ -15,7 +15,7 @@ class GameInstance:
     def run_game(self) -> Solver:
         while not self.solved:
             curr_solver = self.solvers[self.solver_turn]
-            guess = curr_solver.get_guess(self.evaluator)
+            guess = curr_solver.take_turn(self.evaluator)
             if guess == self.answer:
                 self.solved = True
                 return curr_solver
